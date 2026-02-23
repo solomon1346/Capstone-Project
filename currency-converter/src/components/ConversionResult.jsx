@@ -1,9 +1,11 @@
 function ConversionResult({ result }) {
   return (
-    <div className="mt-4 text-center text-xl font-semibold">
-      {result !== null ? `Converted Amount: ${result}` : 'Enter amount to convert'}
+    <div className="text-xl font-semibold">
+      {result
+        ? `Converted Amount: ${result}`
+        : "Converted amount will appear here"}
     </div>
-  )
+  );
 }
 
 export default ConversionResult;
