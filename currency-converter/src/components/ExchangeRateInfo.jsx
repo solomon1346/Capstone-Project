@@ -1,13 +1,11 @@
-function AmountInput({ amount, setAmount }) {
+function ExchangeRateInfo({ fromCurrency, toCurrency, exchangeRate }) {
+  if (!exchangeRate) return null;
+
   return (
-    <input
-      type="number"
-      placeholder="Enter amount"
-      value={amount}
-      onChange={(e) => setAmount(e.target.value)}
-      className="w-full p-3 border rounded mb-4"
-    />
-  )
+    <p className="text-sm text-gray-500 mt-2">
+      1 {fromCurrency} = {exchangeRate} {toCurrency}
+    </p>
+  );
 }
 
-export default AmountInput;
+export default ExchangeRateInfo;

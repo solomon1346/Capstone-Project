@@ -1,15 +1,19 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import AmountInput from "./components/AmountInput";
 import CurrencySelector from "./components/CurrencySelector";
 import ConversionResult from "./components/ConversionResult";
+import ExchangeRateInfo from "./components/ExchangeRateInfo";
 
 function App() {
   const [amount, setAmount] = useState("");
   const [fromCurrency, setFromCurrency] = useState("USD");
   const [toCurrency, setToCurrency] = useState("EUR");
+  const [rates, setRates] = useState({});
   const [result, setResult] = useState(null);
+  const [exchangeRate, setExchangeRate] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  // Temporary static currencies for now
   const currencies = [
     "USD",
     "EUR",
@@ -17,20 +21,62 @@ function App() {
     "JPY",
     "CAD",
     "AUD",
+    "CHF",
+    "CNY",
     "GHS"
   ];
 
+  // Fetch exchange rates when fromCurrency changes
+  useEffect(() => {
+    const fetchRates = async () => {
+      try {
+        setLoading(true);
+        setError("");
+
+        const response = await fetch(
+          `https://v6.exchangerate-api.com/v6/510acefc700b67d3cb548651/latest/${fromCurrency}`
+        );
+
+        const data = await response.json();
+
+        if (data.result !== "success") {
+          throw new Error("API error");
+        }
+
+        setRates(data.conversion_rates);
+      } catch (err) {
+        setError("Failed to fetch exchange rates. Check internet connection.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRates();
+  }, [fromCurrency]);
+
   const handleConvert = () => {
-    // Placeholder logic (real API comes next week)
-    if (!amount) {
-      setResult(null);
+    if (!amount || amount <= 0) {
+      setError("Enter a valid amount.");
       return;
     }
 
-    // Fake temporary conversion for structure testing
-    const fakeRate = 1.2;
-    const converted = (amount * fakeRate).toFixed(2);
+    if (!rates[toCurrency]) {
+      setError("Currency not supported.");
+      return;
+    }
+
+    const rate = rates[toCurrency];
+    const converted = (amount * rate).toFixed(2);
+
+    setExchangeRate(rate);
     setResult(converted);
+    setError("");
+  };
+
+  const handleSwap = () => {
+    setFromCurrency(toCurrency);
+    setToCurrency(fromCurrency);
+    setResult(null);
   };
 
   return (
@@ -49,6 +95,15 @@ function App() {
           currencies={currencies}
         />
 
+        <div className="flex justify-center my-3">
+          <button
+            onClick={handleSwap}
+            className="text-sm text-blue-600 hover:underline"
+          >
+            Swap
+          </button>
+        </div>
+
         <CurrencySelector
           label="To"
           value={toCurrency}
@@ -63,9 +118,28 @@ function App() {
           Convert
         </button>
 
-        <div className="mt-6 text-center">
-          <ConversionResult result={result} />
-        </div>
+        {loading && (
+          <p className="text-center text-gray-500 mt-4">
+            Fetching latest rates...
+          </p>
+        )}
+
+        {error && (
+          <p className="text-center text-red-500 mt-4">
+            {error}
+          </p>
+        )}
+
+        {result && !loading && (
+          <div className="mt-6 text-center">
+            <ConversionResult result={result} />
+            <ExchangeRateInfo
+              fromCurrency={fromCurrency}
+              toCurrency={toCurrency}
+              exchangeRate={exchangeRate}
+            />
+          </div>
+        )}
       </div>
     </div>
   );
