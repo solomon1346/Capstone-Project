@@ -1,0 +1,31 @@
+ Currency Converter – Frontend Capstone Project
+
+ Project Overview
+
+This is a React-based Currency Converter application built as part of a Frontend Capstone Project.
+
+The application allows users to:
+- Enter an amount
+- Select a base currency
+- Select a target currency
+- Convert using real-time exchange rates
+
+Exchange rates are fetched dynamically from the ExchangeRate-API.
+
+ Features
+
+- Real-time currency conversion
+- Live exchange rate fetching
+- Swap currencies functionality
+- Error handling for invalid input
+- Loading state while fetching data
+- Responsive design (Desktop & Mobile)
+- Clean and reusable component structure
+
+Technologies Used
+
+- React (Vite)
+- Tailwind CSS
+- JavaScript (ES6+)
+- ExchangeRate-API
+- Git & Github
